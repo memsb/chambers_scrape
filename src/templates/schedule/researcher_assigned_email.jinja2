@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC “-//W3C//DTD XHTML 1.0 Transitional//EN” “https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd”>
+<html xmlns=“https://www.w3.org/1999/xhtml”>
+<head>
+<title>Researchers Assigned</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+#changes {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#changes td, #changes th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#changes tr:nth-child(even){background-color: #f2f2f2;}
+
+#changes tr:hover {background-color: #ddd;}
+
+#changes th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #04AA6D;
+  color: white;
+}
+</style>
+</head>
+<body>
+<h1>{{pub.get_description()}} Researchers Assigned</h1>
+<table id="changes">
+    <tr>
+        <th>Location</th>
+        <th>Practice</th>
+        <th>Name</th>
+        <th>Phone</th>
+        <th>Email</th>
+    </tr>
+    {% for research in changes -%}
+        <tr>
+            <td>{{research.location}}</td>
+            <td>{{research.practiceArea}}</td>
+            <td>{{research.researcherFullName}}</td>
+            <td>{{research.researcherPhone}}</td>
+            <td>{{research.researcherEmail}}</td>
+        </tr>
+    {% endfor %}
+</table>
+<p><a href="https://lcmillsconsulting.com/research/{{ pub.get_description() }}.html">{{pub.get_description()}} schedule</a></p>
+<p><a href="https://lcmillsconsulting.com/research/">All schedules</a></p>
+</body>
+</html>

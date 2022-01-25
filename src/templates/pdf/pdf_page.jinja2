@@ -1,0 +1,78 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>{{ pub.name }}</title>
+    <script>
+        document.addEventListener('click', function (event) {
+
+            // If the clicked element doesn't have the right selector, bail
+            if (!event.target.matches('.pdf')) return;
+
+            // Don't follow the link
+            event.preventDefault();
+
+            var obj = document.querySelector("#content > embed");
+            obj.setAttribute("src", event.target.href);
+
+        }, false);
+    </script>
+    <style>
+
+        h1 {
+            text-align: center;
+        }
+
+        ul {
+            list-style-type: none;
+        }
+
+       #nav {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            bottom: 10px;
+            width: 20em;
+            background-color: #eee;
+            overflow-x: scroll;
+            overflow-y: scroll;
+        }
+
+        #nav ul {
+            adding-inline-start: 1em;
+        }
+
+        #nav a {
+           line-height: 2;
+           text-decoration: none;
+        }
+
+        #content {
+            margin-left: 21em;
+            margin-bottom: 3em;
+        }
+
+        #content object {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="nav">
+        <ul>
+            {% for file in pub.get_files() -%}
+                <li>
+                    <a class="pdf" href="{{file.get_filename()}}">
+                        {{file.name}}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div id="content">
+          <embed src={{pub.get_files()[0].get_filename()}} type="application/pdf" height="100%" width="100%" />
+    </div>
+
+</body>
+</html>

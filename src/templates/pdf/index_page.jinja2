@@ -1,0 +1,47 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Chambers Publications</title>
+    <style>
+
+        h1 {
+            text-align: center;
+        }
+
+        .guide {
+            width: 200px;
+        }
+
+        ul {
+            list-style-type: none;
+        }
+
+        li {
+            display: inline-grid;
+            margin: 1em;
+            width: 200px;
+        }
+
+        li a {
+            text-decoration: none;
+        }
+
+        p {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<h1>Chambers Publications</h1>
+<ul>
+    {% for pub in pubs -%}
+        <li>
+            <a href="{{pub.name | urlencode}}/">
+                <img class="guide" src="{{pub.name | urlencode}}/cover-image.png">
+                <p>{{ pub.name }}</p>
+            </a>
+        </li>
+    {% endfor %}
+</ul>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex" />
+    <title>Chambers Guides</title>
+
+    <style>
+    * {
+        font-family: sans-serif;
+    }
+
+    p {
+        text-align: center;
+    }
+
+    h1 {
+        font-size: 3em;
+        text-align: center;
+    }
+
+    h2 {
+        text-align: center;
+    }
+    </style>
+
+</head>
+<body>
+    <h1>Chambers Guides</h1>
+    {% for _, guide in guides.items() -%}
+        <h2>{{guide["type"]}}</h2>
+        {% for publication in guide["years"] -%}
+            <a href="{{ publication.get_link() }}/index.html">
+            <p>{{ publication.description }}</p>
+            </a>
+        {% endfor %}
+    {% endfor %}
+</body>
+</html>

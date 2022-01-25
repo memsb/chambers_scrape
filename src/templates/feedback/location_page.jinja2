@@ -1,0 +1,143 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="robots" content="noindex" />
+    <title>{{ location.description }}</title>
+
+    <style>
+    * {
+        font-family: sans-serif;
+    }
+
+    li {
+        line-height: 1.5;
+    }
+
+    #nav {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        bottom: 10px;
+        width: 20em;
+        background-color: #eee;
+        overflow-x: scroll;
+        overflow-y: scroll;
+    }
+
+    #content {
+        margin-left: 21em;
+    }
+
+    .org {
+        padding-bottom: 1em;
+    }
+
+    .practice {
+        padding-top: 2em;
+    }
+
+    h1 {
+        font-size: 3em;
+        text-align: center;
+    }
+
+    h2 {
+        text-align: center;
+    }
+
+    h3 {
+        font-size: 1.4em;
+        text-align: center;
+    }
+
+    h4 {
+        font-size: 1.3em;
+    }
+
+    h5 {
+        font-size: 1em;
+    }
+    </style>
+</head>
+<body>
+<div class="outer">
+
+<div id="nav">
+<ul>
+{% for area in location.practice_areas -%}
+    <li>
+        <a href="#{{ area.get_link() }}">{{ area.description }}</a>
+
+        <ul>
+        {% if area.subsection.individual_rankings: %}
+            <li>
+                <a href="#{{ area.get_link() }}-lawyers">Ranked Lawyers</a>
+            </li>
+        {% endif %}
+
+        {% if area.subsection.organisation_rankings: %}
+            <li>
+                <a href="#{{ area.get_link() }}-departments">Ranked Departments</a>
+            </li>
+        {% endif %}
+        </ul>
+    </li>
+{% endfor %}
+</ul>
+</div>
+
+<div id="content">
+<h1>{{ location.description }}</h1>
+{% for area in location.practice_areas -%}
+    <div class="practice">
+    <a name="{{ area.subsection.get_link() }}"></a>
+    <h2>{{ area.subsection.practiceAreaDescription }}</h2>
+    {% if area.subsection.individual_rankings: %}
+        <div class="lawyers">
+        <a name="{{ area.subsection.get_link() }}-lawyers"></a>
+        <h3>Ranked Lawyers</h3>
+        {% for category in area.subsection.individual_rankings -%}
+            <div class="band">
+            <h4>{{ category['description'] }}</h4>
+            <ul>
+            {% for lawyer in category['individuals'] -%}
+                <li>{{ lawyer['displayName'] }}, {{ lawyer['organisationName'] }}</li>
+            {% endfor %}
+            </ul>
+            </div>
+        {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if area.subsection.organisation_rankings: %}
+        <div class="orgs">
+        <a name="{{ area.subsection.get_link() }}-departments"></a>
+        <h3>Ranked Departments</h3>
+        {% for category in area.subsection.organisation_rankings -%}
+            <div class="band">
+            <h4>{{ category['description'] }}</h4>
+            {% for org in category['organisations'] -%}
+                <div class="org">
+                <h5>{{ org['displayName'] }}</h5>
+                {% for review in org['reviews'] -%}
+                    <div class="review">
+                    {% for reviewContent in review['reviewContent'] -%}
+                        {% for content in reviewContent['content'] -%}
+                            <p>{{ content }}</p>
+                        {% endfor %}
+                    {% endfor %}
+                    </div>
+                {% endfor %}
+                </div>
+            {% endfor %}
+            </div>
+        {% endfor %}
+        </div>
+    {% endif %}
+    </div>
+{% endfor %}
+</div>
+
+</div>
+</body>
+</html>
