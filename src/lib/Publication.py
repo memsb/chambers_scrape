@@ -16,6 +16,7 @@ class Publication:
     isMostRelevant: bool
     active: bool
     issueOrYear: int
+    isRanked: bool
     id: int
     description: str
     feedback_scraped: bool = False
