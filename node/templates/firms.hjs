@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC “-//W3C//DTD XHTML 1.0 Transitional//EN” “https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd”>
+<html xmlns=“https://www.w3.org/1999/xhtml”>
+<head>
+  <title>Firms - {{ publication }}</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" sizes="32x32" href="/site/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/site/img/favicon-16x16.png">
+
+  <!-- Custom Font -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600" rel="stylesheet">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/site/main.css">
+
+</head>
+<body>
+<h1>{{ publication }} Firms</h1>
+
+<table id="rankings">
+    <tr>
+        <th><input type="text" id="firm" name="firm" size="40" placeholder="Firm" disabled></th>
+        <th><input type="text" id="location" name="location" size="20" placeholder="Location" disabled></th>
+        <th><input type="text" id="practice" name="practice" size="40" placeholder="Practice" disabled></th>
+    {{#each years}}
+        <th>
+            <select class="year" name="{{this}}" id="{{this}}" disabled>
+                <option value="" selected>{{this}}</option>
+                <option value="Band 1">Band 1</option>
+                <option value="Band 2">Band 2</option>
+                <option value="Band 3">Band 3</option>
+                <option value="Band 4">Band 4</option>
+                <option value="Band 5">Band 5</option>
+                <option value="Band 6">Band 6</option>
+                <option value="Spotlight">Spotlight</option>
+            </select>
+        </th>
+    {{/each}}
+    </tr>
+{{#each rows}}
+    <tr>
+        <td class="firm">{{this.firm}}</td>
+        <td class="location">{{this.location}}</td>
+        <td class="practice">{{this.practice}}</td>
+    {{#each this.history}}
+        <td class="{{@index}}">{{ this }}</td>
+    {{/each}}
+    </tr>
+{{/each}}
+</table>
+</body>
+    <script type="text/javascript" src="/site/table_filter.js"></script>
+    <script>
+        addFilter("firm");
+        addFilter("location");
+        addFilter("practice");
+    {{#each years}}   
+        addFilter("{{ this }}");
+    {{/each}}
+    </script>
+</html>

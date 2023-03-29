@@ -21,6 +21,8 @@ class Publication:
     description: str
     feedback_scraped: bool = False
     lawyers_scraped: bool = False
+    scraped_lawyers: bool = False
+    scraped_firms: bool = False
     schedule_scraped: bool = False
     research_complete: bool = False
     created_at: str = datetime.utcnow().replace(microsecond=0).isoformat()

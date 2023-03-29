@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC “-//W3C//DTD XHTML 1.0 Transitional//EN” “https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd”>
+<html xmlns=“https://www.w3.org/1999/xhtml”>
+<head>
+  <title>Lawyers - Alternative Legal Service Providers</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" sizes="32x32" href="/site/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/site/img/favicon-16x16.png">
+
+  <!-- Custom Font -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600" rel="stylesheet">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/site/main.css">
+ 
+</head>
+<body>
+<h1>Alternative Legal Service Providers Lawyers</h1>
+
+<table id="rankings">
+    <tr>
+        <th><input type="text" id="lawyer" name="lawyer" size="30" placeholder="Name" disabled></th>
+        <th><input type="text" id="firm" name="firm" size="40" placeholder="Firm" disabled></th>
+        <th><input type="text" id="location" name="location" size="20" placeholder="Location" disabled></th>
+        <th><input type="text" id="practice" name="practice" size="40" placeholder="Practice" disabled></th>
+    </tr>
+</table>
+</body>
+    <script type="text/javascript" src="/site/table_filter.js"></script>
+    <script>
+        addFilter("lawyer");
+        addFilter("firm");
+        addFilter("location");
+        addFilter("practice");
+    </script>
+</html>
