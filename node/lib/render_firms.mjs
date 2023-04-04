@@ -3,17 +3,23 @@ import Handlebars from "handlebars";
 import fs from "fs-extra";
 
 const get_years = (data) => {
-  const years = new Set();
+  const years = {};
   for (const firm of data) {
     for (const [key, section] of Object.entries(firm.ranking)) {
       for (const [year, rank] of Object.entries(section.history)) {
-        if (!(year in years)) {
-          years.add(year);
+        if (year in years) {
+          if (!years[year].includes(rank)) {
+            years[year].push(rank);
+            years[year].sort();
+          }
+        }else{
+          years[year] = [rank];
         }
       }
     }
   }
-  return Array.from(years).sort();
+
+  return years;
 };
 
 export const render_firms = async (guide_id, publication) => {
@@ -31,6 +37,7 @@ export const render_firms = async (guide_id, publication) => {
         history[year] = year in section.history ? section.history[year] : "";
       }
       rows.push({
+        id: firm.id,
         firm: firm.name,
         location: section.locationDescription,
         practice: section.practiceAreaDescription,
@@ -49,10 +56,11 @@ export const render_firms_json = async (guide_id) => {
   for (const firm of data) {
     for (const [key, section] of Object.entries(firm.ranking)) {
       const history = {};
-      for (const year of years) {
+      for (const year of Object.keys(years)) {
         history[year] = year in section.history ? section.history[year] : "";
       }
       firms.push({
+        id: firm.id,
         firm: firm.name,
         location: section.locationDescription,
         practice: section.practiceAreaDescription,
