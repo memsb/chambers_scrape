@@ -18,6 +18,13 @@ resource "aws_cloudwatch_log_group" "lawyers" {
   tags = var.lawyers_tags
 }
 
+resource "aws_cloudwatch_log_group" "firms" {
+  name              = "/ecs/chambers_firms"
+  retention_in_days = 30
+
+  tags = var.firms_tags
+}
+
 resource "aws_cloudwatch_log_group" "publications" {
   name              = "/ecs/chambers_publications"
   retention_in_days = 30

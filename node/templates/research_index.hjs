@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC “-//W3C//DTD XHTML 1.0 Transitional//EN” “https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd”>
+<html xmlns=“https://www.w3.org/1999/xhtml”>
+<head>
+  <title>Research Schedules</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" sizes="32x32" href="/site/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/site/img/favicon-16x16.png">
+
+  <!-- Custom Font -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600" rel="stylesheet">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/site/main.css">
+
+</head>
+<body class="index">
+<h1>Research Schedules</h1>
+
+{{#each grouped_publications}}
+  <h2>{{guideType}}</h2>
+  {{#each this.years}}
+    <p><a href="/research/{{../guideType}} {{this}}.html">{{../guideType}} {{this}}</a></p>
+  {{/each}}
+{{/each}}
+
+</body>
+</html>

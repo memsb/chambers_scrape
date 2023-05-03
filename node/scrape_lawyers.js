@@ -10,9 +10,8 @@ import {
   get_unscraped_publications,
   set_publication_scraped,
   get_guide,
-  get_guides,
 } from "./lib/dynamo.mjs";
-import { render_lawyers, render_index } from "./lib/render_lawyers.mjs";
+import { render_lawyers_json } from "./lib/render_lawyers.mjs";
 import { upload } from "./lib/s3.mjs";
 
 const scrape_lawyers_for_guide = async (guide_id, year) => {
@@ -58,6 +57,8 @@ const scrape_lawyers_for_guide = async (guide_id, year) => {
 };
 
 const run = async () => {
+  console.time("lawyers");
+
   const pubs = await get_unscraped_publications("scraped_lawyers");
 
   // iterate through unscraped publications
@@ -68,13 +69,10 @@ const run = async () => {
     const guide = await get_guide(pub.publicationTypeId);
 
     // scrape API
-    // await scrape_lawyers_for_guide(guide.publicationTypeId, pub.issueOrYear);
+    await scrape_lawyers_for_guide(guide.publicationTypeId, pub.issueOrYear);
 
     // render output
-    const output = await render_lawyers(
-      guide.publicationTypeId,
-      guide.publicationTypeDescription
-    );
+    const output = await render_lawyers_json(guide.publicationTypeId);
 
     // upload to S3
     // fs.writeFileSync(`output/lawyers/${guide.publicationTypeDescription}.html`, output);
@@ -84,14 +82,7 @@ const run = async () => {
     await set_publication_scraped(pub, "scraped_lawyers");
   }
 
-  console.log('Lawyers Index');
-
-  // Update index page for all guides
-  const guides = await get_guides();
-  const index_output = await render_index(guides);
-
-  // upload to S3
-  await upload(`lawyers/index.html`, index_output);
+  console.timeEnd("lawyers");
 };
 
 run();

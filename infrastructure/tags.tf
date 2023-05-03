@@ -26,6 +26,13 @@ variable "lawyers_tags" {
   }
 }
 
+variable "firms_tags" {
+  default = {
+    project = "chambers"
+    app     = "chambers_firms"
+  }
+}
+
 variable "pdfs_tags" {
   default = {
     project = "chambers"

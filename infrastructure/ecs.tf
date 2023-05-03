@@ -41,6 +41,14 @@ resource "aws_ecr_repository" "feedback" {
   tags                 = var.feedback_tags
 }
 
+
+resource "aws_ecr_repository" "node_scrape" {
+  name                 = "node_scrape"
+  image_tag_mutability = "MUTABLE"
+  tags                 = var.chambers_tags
+}
+
+
 resource "aws_ecs_task_definition" "publications" {
   family             = "publications"
   execution_role_arn = aws_iam_role.scrape_chambers.arn
@@ -54,8 +62,8 @@ resource "aws_ecs_task_definition" "publications" {
   container_definitions = jsonencode([
     {
       name    = "publications"
-      command = ["scrape_publications.py"]
-      image   = "${aws_ecr_repository.scrape.repository_url}:latest"
+      command = ["scrape_publications.js"]
+      image   = "${aws_ecr_repository.node_scrape.repository_url}:latest"
       logConfiguration = {
         logDriver = "awslogs"
         options = {
@@ -83,8 +91,8 @@ resource "aws_ecs_task_definition" "lawyers" {
   container_definitions = jsonencode([
     {
       name    = "lawyers"
-      command = ["scrape_lawyers.py"]
-      image   = "${aws_ecr_repository.scrape.repository_url}:latest"
+      command = ["scrape_lawyers.js"]
+      image   = "${aws_ecr_repository.node_scrape.repository_url}:latest"
       logConfiguration = {
         logDriver = "awslogs"
         options = {
@@ -97,6 +105,35 @@ resource "aws_ecs_task_definition" "lawyers" {
   ])
 
   tags = var.lawyers_tags
+}
+
+resource "aws_ecs_task_definition" "firms" {
+  family             = "firms"
+  execution_role_arn = aws_iam_role.scrape_chambers.arn
+  task_role_arn      = aws_iam_role.scrape_chambers.arn
+  requires_compatibilities = [
+  "FARGATE"]
+  cpu          = 256
+  memory       = 512
+  network_mode = "awsvpc"
+
+  container_definitions = jsonencode([
+    {
+      name    = "firms"
+      command = ["scrape_firms.js"]
+      image   = "${aws_ecr_repository.node_scrape.repository_url}:latest"
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.firms.name
+          awslogs-region        = var.region
+          awslogs-stream-prefix = "ecs"
+        }
+      }
+    }
+  ])
+
+  tags = var.firms_tags
 }
 
 resource "aws_ecs_task_definition" "research" {
@@ -112,8 +149,8 @@ resource "aws_ecs_task_definition" "research" {
   container_definitions = jsonencode([
     {
       name    = "research"
-      command = ["scrape_research.py"]
-      image   = "${aws_ecr_repository.scrape.repository_url}:latest"
+      command = ["scrape_research.js"]
+      image   = "${aws_ecr_repository.node_scrape.repository_url}:latest"
       logConfiguration = {
         logDriver = "awslogs"
         options = {

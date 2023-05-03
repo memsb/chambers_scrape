@@ -10,9 +10,8 @@ import {
   get_unscraped_publications,
   set_publication_scraped,
   get_guide,
-  get_guides,
 } from "./lib/dynamo.mjs";
-import { render_firms, render_index } from "./lib/render_firms.mjs";
+import { render_firms_json } from "./lib/render_firms.mjs";
 import { upload } from "./lib/s3.mjs";
 
 const scrape_firms_for_guide = async (guide_id, year) => {
@@ -57,6 +56,7 @@ const scrape_firms_for_guide = async (guide_id, year) => {
 };
 
 const run = async () => {
+  console.time("firms");
   const pubs = await get_unscraped_publications("scraped_firms");
 
   // iterate through unscraped publications
@@ -67,29 +67,19 @@ const run = async () => {
     const guide = await get_guide(pub.publicationTypeId);
 
     // scrape API
-    // await scrape_firms_for_guide(guide.publicationTypeId, pub.issueOrYear);
+    await scrape_firms_for_guide(guide.publicationTypeId, pub.issueOrYear);
 
     // render output
-    const output = await render_firms(
-      guide.publicationTypeId,
-      guide.publicationTypeDescription
-    );
+    const output = await render_firms_json(guide.publicationTypeId);
 
     // upload to S3
-    await upload(`firms/${guide.publicationTypeDescription}.html`, output);
+    await upload(`firms/${guide.publicationTypeId}.json`, output);
 
     // set publication as scraped
     await set_publication_scraped(pub, "scraped_firms");
   }
 
-  console.log('Firms Index');
-
-  // Update index page for all guides
-  const guides = await get_guides();
-  const index_output = await render_index(guides);
-
-  // upload to S3
-  await upload(`firms/index.html`, index_output);
+  console.timeEnd("firms");
 };
 
 run();

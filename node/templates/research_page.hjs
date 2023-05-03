@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC “-//W3C//DTD XHTML 1.0 Transitional//EN” “https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd”>
+<html xmlns=“https://www.w3.org/1999/xhtml”>
+<head>
+  <title>Research Schedule - {{uppercase type}} {{year}}</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" sizes="32x32" href="/site/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/site/img/favicon-16x16.png">
+
+  <!-- Custom Font -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600" rel="stylesheet">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/site/main.css">
+
+</head>
+<body>
+<h1>{{uppercase type}} {{year}} Research Schedule </h1>
+<table id="schedule">
+    <tr>
+        <th>Location</th>
+        <th>Practice</th>
+        <th>Status</th>
+        <th>Date</th>
+        <th>Researcher</th>
+        <th class="notes" style="width:20em;">Notes</th>
+    </tr>
+    {{#each research}}
+    <tr>
+        <td>{{location}}</td>
+        <td>{{practiceArea}}</td>
+        <td>{{status}}</td>
+        <td>{{date statusDate}}</td>
+        <td>{{researcherFullName}}<br />
+        {{researcherPhone}}<br />
+        {{researcherEmail}}</td>
+        <td class="notes" style="width:20em;">{{researcherNotes}}</td>
+    </tr>
+    {{/each}}
+
+</table>
+
+</body>
+</html>

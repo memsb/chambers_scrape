@@ -19,6 +19,13 @@ resource "aws_cloudwatch_event_rule" "lawyers" {
   tags                = var.lawyers_tags
 }
 
+resource "aws_cloudwatch_event_rule" "firms" {
+  name                = "firms_scan"
+  description         = "Scan firms ranked in each publication"
+  schedule_expression = "cron(0 19 ? * * *)"
+  tags                = var.firms_tags
+}
+
 resource "aws_cloudwatch_event_rule" "pdfs" {
   name                = "pdfs_scan"
   description         = "Scrape guide PDFs"
@@ -73,6 +80,7 @@ resource "aws_iam_role_policy" "run_task_role" {
               "${replace(aws_ecs_task_definition.feedback.arn, "/:\\d+$/", ":*")}",
               "${replace(aws_ecs_task_definition.publications.arn, "/:\\d+$/", ":*")}",
               "${replace(aws_ecs_task_definition.lawyers.arn, "/:\\d+$/", ":*")}",
+              "${replace(aws_ecs_task_definition.firms.arn, "/:\\d+$/", ":*")}",
               "${replace(aws_ecs_task_definition.research.arn, "/:\\d+$/", ":*")}",
               "${replace(aws_ecs_task_definition.pdfs.arn, "/:\\d+$/", ":*")}"
             ]
@@ -131,6 +139,26 @@ resource "aws_cloudwatch_event_target" "lawyers" {
   ecs_target {
     group               = "family:chambers"
     task_definition_arn = aws_ecs_task_definition.lawyers.arn
+    launch_type         = "FARGATE"
+    network_configuration {
+      assign_public_ip = true
+      subnets          = data.aws_subnet.subnets.*.id
+      security_groups = [
+        aws_security_group.chambers_scan.id
+      ]
+    }
+  }
+}
+
+resource "aws_cloudwatch_event_target" "firms" {
+  target_id = "firms"
+  rule      = aws_cloudwatch_event_rule.firms.name
+  arn       = aws_ecs_cluster.scrape_chambers.arn
+  role_arn  = aws_iam_role.chambers_ecs_events.arn
+
+  ecs_target {
+    group               = "family:chambers"
+    task_definition_arn = aws_ecs_task_definition.firms.arn
     launch_type         = "FARGATE"
     network_configuration {
       assign_public_ip = true

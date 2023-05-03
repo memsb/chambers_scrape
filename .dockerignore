@@ -1,2 +1,4 @@
 output/
 src/output
+node/output
+node/node_modules

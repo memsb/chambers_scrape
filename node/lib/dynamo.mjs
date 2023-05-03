@@ -2,6 +2,7 @@ import {
   DynamoDBDocumentClient,
   PutCommand,
   GetCommand,
+  UpdateCommand,
   QueryCommand,
   ScanCommand,
 } from "@aws-sdk/lib-dynamodb";
@@ -340,6 +341,32 @@ export const get_laywers_for_guide = async (guide_id) => {
   );
 };
 
+export const get_publication = async (id) => {
+  const response = await ddbDocClient.send(
+    new QueryCommand({
+      TableName: "chambers_publications",
+      ExpressionAttributeNames: {
+        "#id": "id",
+      },
+      ExpressionAttributeValues: {
+        ":id": id,
+      },
+      KeyConditionExpression: "#id = :id",
+    })
+  );
+
+  return response.Items[0];
+};
+
+export const save_publication = async (publication) => {
+  await ddbDocClient.send(
+    new PutCommand({
+      TableName: "chambers_publications",
+      Item: publication,
+    })
+  );
+};
+
 export const get_unscraped_publications = async (field) => {
   return await paginate(
     new ScanCommand({
@@ -382,6 +409,15 @@ export const get_guide = async (publicationTypeId) => {
   return response.Items[0];
 };
 
+export const save_guide = async (guide) => {
+  await ddbDocClient.send(
+    new PutCommand({
+      TableName: "chambers_guides",
+      Item: guide,
+    })
+  );
+};
+
 const paginate = async (command) => {
   let items = [];
   let lastEvaluatedKey;
@@ -401,6 +437,101 @@ export const get_guides = async () => {
   return await paginate(
     new ScanCommand({
       TableName: "chambers_guides",
+    })
+  );
+};
+
+export const get_research_publications = async () => {
+  return await paginate(
+    new ScanCommand({
+      TableName: "chambers_publication_research",
+    })
+  );
+};
+
+export const get_researching_publication = async (id, guidYear) => {
+  const response = await ddbDocClient.send(
+    new QueryCommand({
+      TableName: "chambers_publication_research",
+      ExpressionAttributeNames: {
+        "#id": "id",
+        "#y": "guideYear",
+      },
+      ExpressionAttributeValues: {
+        ":id": id,
+        ":y": guidYear,
+      },
+      KeyConditionExpression: "#id = :id and #y = :y",
+    })
+  );
+
+  return response.Items[0];
+};
+
+export const add_researching_publication = async (publication) => {
+  await ddbDocClient.send(
+    new PutCommand({
+      TableName: "chambers_publication_research",
+      Item: publication,
+    })
+  );
+};
+
+export const set_publication_research_complete = async (publication) => {
+  publication.research_complete = true;
+  await ddbDocClient.send(
+    new UpdateCommand({
+      TableName: "chambers_publication_research",
+      ExpressionAttributeNames: {
+        "#r": "research_complete",
+      },
+      ExpressionAttributeValues: {
+        ":r": true,
+      },
+      UpdateExpression: "SET #r = :r"
+    })
+  );
+};
+
+export const get_research = async (id) => {
+  const response = await ddbDocClient.send(
+    new QueryCommand({
+      TableName: "chambers_research",
+      ExpressionAttributeNames: {
+        "#id": "id",
+      },
+      ExpressionAttributeValues: {
+        ":id": id,
+      },
+      KeyConditionExpression: "#id = :id",
+    })
+  );
+
+  return response.Items[0];
+};
+
+export const get_research_for_publication = async (type, year) => {
+  return await paginate(
+    new ScanCommand({
+      TableName: "chambers_research",      
+      ExpressionAttributeNames: {
+        "#t": 'guideType',
+        "#y": 'guideYear',
+      },
+      ExpressionAttributeValues: {
+        ":t": type,
+        ":y": year,
+      },
+      FilterExpression: "#t = :t and #y = :y",
+    })
+  );
+};
+
+export const add_research = async (research) => {
+  await ddbDocClient.send(
+    new PutCommand({
+      TableName: "chambers_research",
+      Item: research,
     })
   );
 };

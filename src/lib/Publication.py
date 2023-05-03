@@ -16,9 +16,9 @@ class Publication:
     isMostRelevant: bool
     active: bool
     issueOrYear: int
-    isRanked: bool
     id: int
     description: str
+    isRanked: bool = False
     feedback_scraped: bool = False
     lawyers_scraped: bool = False
     scraped_lawyers: bool = False
