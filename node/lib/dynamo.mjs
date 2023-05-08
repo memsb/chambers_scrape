@@ -478,10 +478,13 @@ export const add_researching_publication = async (publication) => {
 };
 
 export const set_publication_research_complete = async (publication) => {
-  publication.research_complete = true;
   await ddbDocClient.send(
     new UpdateCommand({
       TableName: "chambers_publication_research",
+      Key: {
+        id: publication.id,
+        guideYear: publication.guideYear
+      },
       ExpressionAttributeNames: {
         "#r": "research_complete",
       },

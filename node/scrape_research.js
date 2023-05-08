@@ -10,8 +10,7 @@ import {
   add_researching_publication,
   set_publication_research_complete,
   add_research,
-  get_research,
-  get_research_publications
+  get_research
 } from "./lib/dynamo.mjs";
 import { render_research_page, render_index } from "./lib/render_research.mjs";
 import { upload } from "./lib/s3.mjs";
@@ -30,7 +29,7 @@ const scrape_detailed_research_for_guide = async (guide_id) => {
 const scrape_research_for_guide = async (publication) => {
   const items = await scrape_detailed_research_for_guide(publication.id);
 
-  for (let research of items){
+  for (let research of items) {
     let db_item = await get_research(research.id);
     if (db_item) {
       const updated_item = {...db_item, ...research};
