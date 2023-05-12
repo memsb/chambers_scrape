@@ -49,11 +49,14 @@ const scrape_research_for_guide = async (publication) => {
   }
 };
 
-const create_new_researching_publication = async (guide_id, guideType, guideYear) => {
+const create_new_researching_publication = async (guide_id) => {
+  const result = await get_research_for_guide(guide_id);
+  const first_item = result.data[0];
+
   let publication = {
     id: guide_id,
-    guideType: guideType,
-    guideYear: guideYear,
+    guideType: first_item.guideType,
+    guideYear: first_item.guideYear,
     research_complete: false
   };
   console.log('New researching publication', publication);
@@ -76,7 +79,7 @@ const run = async () => {
     let publication = await get_currently_researching_publication(guide.id);
 
     if (!publication) {
-      publication = await create_new_researching_publication(guide_id, first_item.guideType, first_item.guideYear);
+      publication = await create_new_researching_publication(guide.id);
       const index = await render_index();
       await upload('research/index.html', index);
     }
