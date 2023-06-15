@@ -1,7 +1,6 @@
 import {
   get_locations,
   get_practise_areas,
-  get_subsections,
   get_individual_rankings,
 } from "./lib/chambers_api.mjs";
 import {
@@ -10,6 +9,7 @@ import {
   get_unscraped_publications,
   set_publication_scraped,
   get_guide,
+  new_lawyer,
 } from "./lib/dynamo.mjs";
 import { render_lawyers_json } from "./lib/render_lawyers.mjs";
 import { upload } from "./lib/s3.mjs";
@@ -19,32 +19,31 @@ const scrape_lawyers_for_guide = async (guide_id, year) => {
     console.log(` ${location.description}`);
 
     for (const practise of await get_practise_areas(guide_id, location.id)) {
-      const subsection = await get_subsections(
-        guide_id,
-        location.id,
-        practise.id,
-        practise.subsectionTypeId
-      );
-      const area = subsection.subsection;
-      for (const ranked of await get_individual_rankings(area.id)) {
+      const section_id = `${practise.id}:${location.id}:${practise.subsectionTypeId}`;
+      for (const ranked of await get_individual_rankings(section_id)) {
         for (const category of ranked.categories) {
+          const rank = category.description;
           for (const data of category.individuals) {
-            const individual = await get_individual(data, guide_id);
+            let individual = await get_individual(data, guide_id);
+
+            if (!individual) {
+              individual = new_lawyer(data, guide_id);
+            }
 
             // Add new subsection
-            if (!(area.id in individual.ranking)) {
-              individual.ranking[area.id] = {
-                locationId: area.locationId,
-                locationDescription: area.locationDescription,
-                practiceAreaId: area.practiceAreaId,
-                practiceAreaDescription: area.practiceAreaDescription,
+            if (!(section_id in individual.ranking)) {
+              individual.ranking[section_id] = {
+                locationId: location.id,
+                locationDescription: location.description,
+                practiceAreaId: practise.id,
+                practiceAreaDescription: practise.description,
                 history: {},
               };
             }
 
             // Update ranking history
-            if (!(year in individual.ranking[area.id].history)) {
-              individual.ranking[area.id].history[year] = rank;
+            if (!(year in individual.ranking[section_id].history)) {
+              individual.ranking[section_id].history[year] = rank;
 
               // save to DB
               await save_individual(individual);
@@ -75,7 +74,6 @@ const run = async () => {
     const output = await render_lawyers_json(guide.publicationTypeId);
 
     // upload to S3
-    // fs.writeFileSync(`output/lawyers/${guide.publicationTypeDescription}.html`, output);
     await upload(`lawyers/${guide.publicationTypeDescription}.html`, output);
 
     // set publication as scraped

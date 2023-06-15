@@ -18,7 +18,7 @@ import {
       );
   
       // upload to S3
-      fs.writeFileSync(`output/lawyers/${guide.publicationTypeId}.json`, output);
+      // fs.writeFileSync(`output/lawyers/${guide.publicationTypeId}.json`, output);
       await upload(`lawyers/${guide.publicationTypeId}.json`, output);
   
     }

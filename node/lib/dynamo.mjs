@@ -213,7 +213,7 @@ export const find_lawyer_by_name = async (name) => {
   return response.Items[0];
 };
 
-export const new_lawyer = async (data, guide_id) => {
+export const new_lawyer = (data, guide_id) => {
   return {
     id: data.personOrganisationId,
     guide: guide_id,
@@ -250,7 +250,7 @@ const read_firm = async (firm_id, guide_id) => {
   return response.Item;
 };
 
-const new_firm = async (data, guide_id) => {
+export const new_firm = (data, guide_id) => {
   return {
     id: data.parentOrganisationId,
     guide: guide_id,
@@ -337,6 +337,22 @@ export const get_laywers_for_guide = async (guide_id) => {
         ":g": guide_id,
       },
       KeyConditionExpression: "#g = :g",
+    })
+  );
+};
+
+export const get_laywers = async () => {
+  return await paginate(
+    new ScanCommand({
+      TableName: "lawyers"
+    })
+  );
+};
+
+export const get_firms = async () => {
+  return await paginate(
+    new ScanCommand({
+      TableName: "firms"
     })
   );
 };
