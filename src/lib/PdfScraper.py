@@ -50,7 +50,7 @@ class PdfScraper:
     def download_files(self, pub_assets: PublicationAssets):
         downloader = Downloader()
         for file in downloader.get_files(pub_assets):
-            self.s3.upload_file(file, f"pdf/{pub_assets.name}")
+            self.s3.upload_file(file, f"pdf/{pub_assets.name}", {'ContentType': 'application/pdf'})
 
     def create_index_page(self):
         pubs = self.db.get_all_publication_assets()

@@ -12,6 +12,9 @@ class NoDetailsFoundException(Exception):
 class PublicationNotFoundException(Exception):
     pass
 
+class SubsectionUnavailableException(Exception):
+    pass
+
 
 class PublicationUnavailableException(Exception):
 

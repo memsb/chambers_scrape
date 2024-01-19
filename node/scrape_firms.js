@@ -1,6 +1,7 @@
 import {
   get_locations,
   get_practise_areas,
+  get_subsections,
   get_firm_rankings,
 } from "./lib/chambers_api.mjs";
 import {
@@ -19,8 +20,9 @@ const scrape_firms_for_guide = async (guide_id, year) => {
     console.log(` ${location.description}`);
 
     for (const practise of await get_practise_areas(guide_id, location.id)) {
-      const section_id = `${practise.id}:${location.id}:${practise.subsectionTypeId}`;
-      const ranked = await get_firm_rankings(section_id);
+      const section_id = `${practise.id}:${location.id}`;
+      const subsections = await get_subsections(guide_id, location.id, practise.id, practise.subsectionTypeId);
+      const ranked = await get_firm_rankings(subsections.subsection.id);
       if (ranked) {
         for (const category of ranked.categories) {
           const rank = category.description;

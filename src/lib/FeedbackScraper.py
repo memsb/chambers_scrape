@@ -10,7 +10,6 @@ from lib.s3 import S3
 from lib.Publication import Publication
 from lib.FeedbackIndexPage import FeedbackIndexPage
 
-
 class FeedbackScraper:
 
     def __init__(self, api: ChambersApi, db: Dynamo, s3: S3, emailer: Emailer):
@@ -49,10 +48,14 @@ class FeedbackScraper:
             print("\t" + location.description)
             locations.append(location)
             for area in self.api.get_practice_areas(pub, location):
-                location.practice_areas.append(area)
 
-                subsection = self.api.get_subsections(pub, location, area)
+                try:
+                    subsection = self.api.get_subsections(pub, location, area)
+                except:
+                    continue
+                
                 area.subsection = subsection
+                location.practice_areas.append(area)
 
                 individual_rankings = self.api.get_individual_rankings(
                     subsection)
@@ -72,11 +75,11 @@ class FeedbackScraper:
 
     def create_location_page(self, publication: Publication, location: Location):
         page = LocationPage(publication, location)
-        self.s3.upload_page(page, f"guides/{publication.description}")
+        self.s3.upload_page(page, f"feedback/{publication.description}")
 
     def create_publication_page(self, publication: Publication, locations: List[Location]):
         page = FeedbackPage(publication, locations)
-        self.s3.upload_page(page, f"guides/{publication.description}")
+        self.s3.upload_page(page, f"feedback/{publication.description}")
 
     def send_notifications(self, publication: Publication):
         subscribers = self.db.get_guide_subscribers(
@@ -92,4 +95,4 @@ class FeedbackScraper:
     def update_index_page(self):
         publications = self.db.get_publications_with_scraped_feedback()
         index_page = FeedbackIndexPage(publications)
-        self.s3.upload_page(index_page, 'guides')
+        self.s3.upload_page(index_page, 'feedback')

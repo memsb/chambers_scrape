@@ -1,6 +1,7 @@
 import {
   get_locations,
   get_practise_areas,
+  get_subsections,
   get_individual_rankings,
 } from "./lib/chambers_api.mjs";
 import {
@@ -10,6 +11,7 @@ import {
   set_publication_scraped,
   get_guide,
   new_lawyer,
+  get_publication,
 } from "./lib/dynamo.mjs";
 import { render_lawyers_json } from "./lib/render_lawyers.mjs";
 import { upload } from "./lib/s3.mjs";
@@ -19,8 +21,9 @@ const scrape_lawyers_for_guide = async (guide_id, year) => {
     console.log(` ${location.description}`);
 
     for (const practise of await get_practise_areas(guide_id, location.id)) {
-      const section_id = `${practise.id}:${location.id}:${practise.subsectionTypeId}`;
-      for (const ranked of await get_individual_rankings(section_id)) {
+      const section_id = `${practise.id}:${location.id}`;
+      const subsections = await get_subsections(guide_id, location.id, practise.id, practise.subsectionTypeId);
+      for (const ranked of await get_individual_rankings(subsections.subsection.id)) {
         for (const category of ranked.categories) {
           const rank = category.description;
           for (const data of category.individuals) {
@@ -74,7 +77,7 @@ const run = async () => {
     const output = await render_lawyers_json(guide.publicationTypeId);
 
     // upload to S3
-    await upload(`lawyers/${guide.publicationTypeDescription}.html`, output);
+    await upload(`lawyers/${guide.publicationTypeId}.json`, output);
 
     // set publication as scraped
     await set_publication_scraped(pub, "scraped_lawyers");

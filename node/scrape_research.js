@@ -1,4 +1,3 @@
-import _, { map } from 'underscore';
 import {
   get_all_research_for_guide,
   get_research_for_guide,
@@ -21,7 +20,7 @@ const scrape_detailed_research_for_guide = async (guide_id) => {
   return await Promise.all(
     items.map(async (item) => {
       const details = await get_research_details(item.id);
-      return {...item, ...details};
+      return { ...item, ...details };
     })
   );
 };
@@ -32,11 +31,8 @@ const scrape_research_for_guide = async (publication) => {
   for (let research of items) {
     let db_item = await get_research(research.id);
     if (db_item) {
-      const updated_item = {...db_item, ...research};
-      const is_updated = _.isEqual(db_item, updated_item);
-      if (is_updated) {
-        await add_research(updated_item);
-      }
+      const updated_item = { ...db_item, ...research };
+      await add_research(updated_item);
     } else {
       // add to DB
       await add_research(research);
@@ -63,14 +59,14 @@ const create_new_researching_publication = async (guide_id) => {
   await add_researching_publication(publication);
 
   return publication;
-}
+};
 
 const get_currently_researching_publication = async (guide_id) => {
   const result = await get_research_for_guide(guide_id);
   const first_item = result.data[0];
 
   return await get_researching_publication(guide_id, first_item.guideYear);
-}
+};
 
 const run = async () => {
   const guides = await get_researching_guides();
@@ -85,19 +81,18 @@ const run = async () => {
     }
 
     if (!publication.research_complete) {
-        const publication_name = `${publication.guideType} ${publication.guideYear}`;
-        console.log(`Updating schedule for ${publication_name}`);
-        console.time(publication_name);
+      const publication_name = `${publication.guideType} ${publication.guideYear}`;
+      console.log(`Updating schedule for ${publication_name}`);
+      console.time(publication_name);
 
-        await scrape_research_for_guide(publication);
+      await scrape_research_for_guide(publication);
 
-        const page = await render_research_page(publication);
-        await upload(`research/${publication_name}.html`, page);
+      const page = await render_research_page(publication);
+      await upload(`research/${publication_name}.html`, page);
 
-        console.timeEnd(publication_name);
+      console.timeEnd(publication_name);
     }
   }
 };
 
 run();
-  

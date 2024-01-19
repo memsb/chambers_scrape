@@ -5,7 +5,7 @@ from lib.Location import Location
 from lib.PracticeArea import PracticeArea
 from lib.Subsection import Subsection
 
-from lib.exceptions import EmptyScheduleException, NoDetailsFoundException, PublicationUnavailableException
+from lib.exceptions import EmptyScheduleException, NoDetailsFoundException, PublicationUnavailableException, SubsectionUnavailableException
 
 from lib.Publication import Publication
 from lib.PublicationAssets import PublicationAssets
@@ -54,10 +54,13 @@ class ChambersApi:
     def get_subsections(self, pub: Publication, location: Location, area: PracticeArea) -> Subsection:
         url = f"https://api.chambers.com/api/publications/{pub.publicationTypeId}/practiceareas/{area.id}/locations/{location.id}/subsectiontypes/{area.subsectionTypeId}/subsections"
         response = requests.get(url)
-        json = response.json()
-        data = json["subsection"]
+        try:
+            json = response.json()
+            data = json["subsection"]
 
-        return Subsection(**data)
+            return Subsection(**data)
+        except JSONDecodeError:
+            raise SubsectionUnavailableException()
 
     def get_individual_rankings(self, sub: Subsection):
         url = f"https://api.chambers.com/api/subsections/{sub.id}/individual-rankings"
