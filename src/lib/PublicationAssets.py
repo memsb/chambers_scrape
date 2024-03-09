@@ -29,4 +29,4 @@ class PublicationAssets:
         return [PdfDetails(**file) for file in self.files]
 
     def is_live(self) -> bool:
-        return self.status == "Live"
+        return self.status == "Live" and self.files
