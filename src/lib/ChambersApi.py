@@ -63,20 +63,26 @@ class ChambersApi:
             raise SubsectionUnavailableException()
 
     def get_individual_rankings(self, sub: Subsection):
-        url = f"https://api.chambers.com/api/subsections/{sub.id}/individual-rankings"
+        url = f"https://ranking-tables.chambers.com/api/subsections/{sub.id}/ranked-individuals"
         response = requests.get(url)
-
-        rankings = response.json()['individualRankings']
-        if not rankings:
+        try:
+            json = response.json()
+            data = json[0]['categories']
+        except JSONDecodeError:
             return []
 
-        return rankings[0]['categories']
+        return data
 
     def get_organisation_rankings(self, sub: Subsection):
-        url = f"https://api.chambers.com/api/subsections/{sub.id}/organisation-rankings"
+        url = f"https://ranking-tables.chambers.com/api/subsections/{sub.id}/ranked-organisations"
         response = requests.get(url)
+        try:
+            json = response.json()
+            data = json['categories']
+        except JSONDecodeError:
+            return []
 
-        return response.json()['categories']
+        return data
 
     def get_reviews(self, pub: Publication, location: Location, area: PracticeArea, org_id):
         params = {
