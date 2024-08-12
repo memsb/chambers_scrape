@@ -44,6 +44,13 @@ const scrape_lawyers_for_guide = async (guide_id, year) => {
               };
             }
 
+            // Update lawyers details
+            if (individual.firm !== data.organisationName) {
+              individual.firm = data.organisationName;
+              // save to DB
+              await save_individual(individual);
+            }
+
             // Update ranking history
             if (!(year in individual.ranking[section_id].history)) {
               individual.ranking[section_id].history[year] = rank;
