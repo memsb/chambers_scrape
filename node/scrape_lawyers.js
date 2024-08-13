@@ -15,8 +15,11 @@ import {
 } from "./lib/dynamo.mjs";
 import { render_lawyers_json } from "./lib/render_lawyers.mjs";
 import { upload } from "./lib/s3.mjs";
+import { create_movers_report } from "./lib/movers_email.mjs";
 
 const scrape_lawyers_for_guide = async (guide_id, year) => {
+  let movers = [];
+
   for (const location of await get_locations(guide_id)) {
     console.log(` ${location.description}`);
 
@@ -44,16 +47,23 @@ const scrape_lawyers_for_guide = async (guide_id, year) => {
               };
             }
 
-            // Update lawyers details
-            if (individual.firm !== data.organisationName) {
-              individual.firm = data.organisationName;
+            // Update ranking history
+            if (!(year in individual.ranking[section_id].history)) {
+              individual.ranking[section_id].history[year] = rank;
+
               // save to DB
               await save_individual(individual);
             }
 
-            // Update ranking history
-            if (!(year in individual.ranking[section_id].history)) {
-              individual.ranking[section_id].history[year] = rank;
+            // Update lawyers details
+            if (individual.firm !== data.organisationName) {
+              movers.push({
+                name: individual.name,
+                previous: individual.firm,
+                current: data.organisationName
+              });
+
+              individual.firm = data.organisationName;
 
               // save to DB
               await save_individual(individual);
@@ -63,6 +73,8 @@ const scrape_lawyers_for_guide = async (guide_id, year) => {
       }
     }
   }
+
+  return movers;
 };
 
 const run = async () => {
@@ -78,7 +90,7 @@ const run = async () => {
     const guide = await get_guide(pub.publicationTypeId);
 
     // scrape API
-    await scrape_lawyers_for_guide(guide.publicationTypeId, pub.issueOrYear);
+    const movers = await scrape_lawyers_for_guide(guide.publicationTypeId, pub.issueOrYear);
 
     // render output
     const output = await render_lawyers_json(guide.publicationTypeId);
@@ -88,6 +100,11 @@ const run = async () => {
 
     // set publication as scraped
     await set_publication_scraped(pub, "scraped_lawyers");
+
+    // Email out list of lawyers who have moved firm
+    if (pub.publicationTypeId == 5) {
+      create_movers_report(pub.description, movers);
+    }
   }
 
   console.timeEnd("lawyers");
